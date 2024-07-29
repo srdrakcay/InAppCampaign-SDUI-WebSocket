@@ -41,7 +41,6 @@ class SocketManager @Inject constructor(
 
             override fun onMessage(webSocket: WebSocket, text: String) {
                 super.onMessage(webSocket, text)
-                Log.e("TAG", "onMessage: $text", )
                 val response = gson.fromJson(text, SocketResponse::class.java)
                 trySendBlocking(
                     WebSocketResource.Open(
