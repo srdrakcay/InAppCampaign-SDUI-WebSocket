@@ -15,11 +15,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -32,39 +27,16 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.talkie.inappcampaign_sdui_websocket.R
 import com.talkie.inappcampaign_sdui_websocket.data.dto.SocketResponse
-import com.talkie.inappcampaign_sdui_websocket.data.resource.WebSocketResource
 import com.talkie.inappcampaign_sdui_websocket.feature.MainViewModel
 import com.talkie.inappcampaign_sdui_websocket.util.colorText
 import com.talkie.inappcampaign_sdui_websocket.util.position
 
 @Composable
 fun MainScreen(mainViewModel: MainViewModel = hiltViewModel()) {
-    val dataValues =
-        mainViewModel.socketEvent.collectAsState(initial = WebSocketResource.Connecting)
-    var data by remember { mutableStateOf(SocketResponse(socketData = listOf())) }
-
-    when (dataValues.value) {
-        WebSocketResource.Closed -> {
-        }
-
-        WebSocketResource.Closing -> {
-        }
-
-        WebSocketResource.Connected -> {
-        }
-
-        WebSocketResource.Connecting -> {
-        }
-
-        is WebSocketResource.Failure -> {
-        }
-
-        is WebSocketResource.Open -> {
-            data = (dataValues.value as WebSocketResource.Open).response
-        }
+    if (mainViewModel.socketData.isNotEmpty()){
+        DifferentItemsLazyColumn(mainViewModel.socketData.first())
 
     }
-    DifferentItemsLazyColumn(data)
 
 }
 
@@ -99,6 +71,7 @@ fun DifferentItemsLazyColumn(data: SocketResponse) {
                         cardTimeElevation = item.cardTimeElevation
                     )
                 }
+
                 "Image" -> {
                     GradientCard(
                         paddingCard = item.paddingCard,
@@ -142,11 +115,11 @@ fun GradientCard(
     alignmentText: Alignment,
     paddingText: Int,
     texSize: Int,
-    cardTimeCornerRadius:Int,
-    sizeW:Int,
-    sizeH:Int,
-    cardPadding:Int,
-    cardTimeElevation:Int
+    cardTimeCornerRadius: Int,
+    sizeW: Int,
+    sizeH: Int,
+    cardPadding: Int,
+    cardTimeElevation: Int
 ) {
     Card(
         shape = RoundedCornerShape(roundedCornerShape.dp),
@@ -205,7 +178,6 @@ fun GradientCard(
     }
 
 }
-
 
 
 @Preview(showBackground = true)
