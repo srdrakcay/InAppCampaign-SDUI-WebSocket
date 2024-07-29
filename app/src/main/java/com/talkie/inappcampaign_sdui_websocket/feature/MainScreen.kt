@@ -33,13 +33,11 @@ import com.talkie.inappcampaign_sdui_websocket.util.position
 
 @Composable
 fun MainScreen(mainViewModel: MainViewModel = hiltViewModel()) {
-    if (mainViewModel.socketData.isNotEmpty()){
+    if (mainViewModel.socketData.isNotEmpty()) {
         DifferentItemsLazyColumn(mainViewModel.socketData.first())
-
     }
 
 }
-
 @Composable
 fun DifferentItemsLazyColumn(data: SocketResponse) {
     LazyColumn(
