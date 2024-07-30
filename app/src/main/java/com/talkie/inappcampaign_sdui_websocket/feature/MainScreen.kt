@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.talkie.inappcampaign_sdui_websocket.R
 import com.talkie.inappcampaign_sdui_websocket.data.dto.SocketResponse
 import com.talkie.inappcampaign_sdui_websocket.feature.MainViewModel
+import com.talkie.inappcampaign_sdui_websocket.feature.ViewScreenType
 import com.talkie.inappcampaign_sdui_websocket.util.colorText
 import com.talkie.inappcampaign_sdui_websocket.util.position
 
@@ -46,8 +47,9 @@ fun DifferentItemsLazyColumn(data: SocketResponse) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(data.socketData) { item ->
-            when (item.type) {
-                "Text" -> {
+            val itemType = ViewScreenType.fromString(item.type)
+            when (itemType) {
+                ViewScreenType.Text -> {
                     GradientCard(
                         paddingCard = item.paddingCard,
                         height = item.height,
@@ -69,29 +71,31 @@ fun DifferentItemsLazyColumn(data: SocketResponse) {
                         cardTimeElevation = item.cardTimeElevation
                     )
                 }
+                ViewScreenType.Image -> {
+                    GradientCard(
+                        paddingCard = item.paddingCard,
+                        height = item.height,
+                        roundedCornerShape = item.roundedCornerShape,
+                        cardElevation = item.cardElevation,
+                        verticalGradient1 = colorText(item.verticalGradient1),
+                        verticalGradient2 = colorText(item.verticalGradient2),
+                        painterResource = R.drawable.ic_diamond1,
+                        alignment = position(item.alignment),
+                        alignmentText = position(item.alignmentText),
+                        messageText = item.messageText,
+                        paddingText = item.paddingText,
+                        imageSize = item.imageSize,
+                        texSize = item.texSize,
+                        cardTimeCornerRadius = item.cardTimeCornerRadius,
+                        sizeW = item.sizeW,
+                        sizeH = item.sizeH,
+                        cardPadding = item.cardPadding,
+                        cardTimeElevation = item.cardTimeElevation
+                    )
+                }
+              else->{
 
-                "Image" -> {
-                    GradientCard(
-                        paddingCard = item.paddingCard,
-                        height = item.height,
-                        roundedCornerShape = item.roundedCornerShape,
-                        cardElevation = item.cardElevation,
-                        verticalGradient1 = colorText(item.verticalGradient1),
-                        verticalGradient2 = colorText(item.verticalGradient2),
-                        painterResource = R.drawable.ic_diamond1,
-                        alignment = position(item.alignment),
-                        alignmentText = position(item.alignmentText),
-                        messageText = item.messageText,
-                        paddingText = item.paddingText,
-                        imageSize = item.imageSize,
-                        texSize = item.texSize,
-                        cardTimeCornerRadius = item.cardTimeCornerRadius,
-                        sizeW = item.sizeW,
-                        sizeH = item.sizeH,
-                        cardPadding = item.cardPadding,
-                        cardTimeElevation = item.cardTimeElevation
-                    )
-                }
+              }
             }
         }
     }
