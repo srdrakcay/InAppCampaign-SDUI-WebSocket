@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.talkie.inappcampaign_sdui_websocket"
+    namespace = "com.serdar.inappcampaign_sdui_websocket"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.talkie.inappcampaign_sdui_websocket"
+        applicationId = "com.serdar.inappcampaign_sdui_websocket"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
