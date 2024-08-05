@@ -30,5 +30,5 @@ object SocketNetworkModule {
 
 }
 object Constant {
-    const val SOCKET_URL = "wss://free.blr2.piesocket.com/v3/1?api_key=5dW54USwUfXObPqu8127QhveioUEx3StXRD4XA0N&notify_self=1"
+    const val SOCKET_URL = "wss://free.blr2.piesocket.com/v3/1?api_key=FtfXQRNNCDFsFPFJSiimRmcc8mB6YZA2vGFoP0l6&notify_self=1"
 }

@@ -1,14 +1,17 @@
 package com.serdar.inappcampaign_sdui_websocket.feature
 
 enum class ViewScreenType {
-    Text,
-    Image;
+    Text, Image, YouFollow, VideoMatches, Empty, MostPopular;
+
     companion object {
-        fun fromString(type: String): ViewScreenType? {
+        fun fromString(type: String): ViewScreenType {
             return when (type.uppercase()) {
-                "TEXT" -> Text
-                "IMAGE" -> Image
-                else -> {Text}
+                "Best Video Matches" -> VideoMatches
+                "Users You Follow" -> YouFollow
+                "Most Popular" -> MostPopular
+                else -> {
+                    Empty
+                }
             }
         }
     }

@@ -1,6 +1,8 @@
 package com.serdar.inappcampaign_sdui_websocket.util
 
 import androidx.compose.ui.graphics.Color
+import com.serdar.inappcampaign_sdui_websocket.ui.theme.BlueFirst
+import com.serdar.inappcampaign_sdui_websocket.ui.theme.PinkFirst
 
 fun colorText(color: String): Color {
     return when (color) {
@@ -18,6 +20,12 @@ fun colorText(color: String): Color {
 
         "Yellow" -> {
             Color.Yellow
+        }
+        "PinkFirst" -> {
+            PinkFirst
+        }
+        "BlueFirst" -> {
+            BlueFirst
         }
 
         else -> {

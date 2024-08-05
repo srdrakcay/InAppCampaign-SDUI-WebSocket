@@ -41,7 +41,7 @@ class SocketManager @Inject constructor(
 
             override fun onMessage(webSocket: WebSocket, text: String) {
                 super.onMessage(webSocket, text)
-                val response = gson.fromJson(text, SocketResponse::class.java)
+                val response = gson.fromJson(text.trim(), SocketResponse::class.java)
                 trySendBlocking(
                     WebSocketResource.Open(
                         response
