@@ -28,26 +28,23 @@ class MainViewModel @Inject constructor(private val repository: SocketNetworkRep
             repository.getSocketEventData().distinctUntilChanged().collect {
                 when (it) {
                     WebSocketResource.Closed -> {
-                        Log.e("TAG", "connectSocket Closed: ${it} ", )
 
                     }
 
                     WebSocketResource.Closing -> {
-                        Log.e("TAG", "connectSocket Closing: ${it} ", )
 
                     }
 
                     WebSocketResource.Connected -> {
-                        Log.e("TAG", "connectSocket Connected: ${it} ", )
 
                     }
 
                     WebSocketResource.Connecting -> {
-                        Log.e("TAG", "connectSocket Connecting: ${it} ", )
 
                     }
 
                     is WebSocketResource.Failure -> {
+
                     }
 
                     is WebSocketResource.Open -> {
@@ -62,6 +59,5 @@ class MainViewModel @Inject constructor(private val repository: SocketNetworkRep
 
         }
     }
-
 
 }
