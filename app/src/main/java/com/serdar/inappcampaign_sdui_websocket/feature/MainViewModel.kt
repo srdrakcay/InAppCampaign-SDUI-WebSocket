@@ -1,6 +1,5 @@
 package com.serdar.inappcampaign_sdui_websocket.feature
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -48,7 +47,9 @@ class MainViewModel @Inject constructor(private val repository: SocketNetworkRep
                     }
 
                     is WebSocketResource.Open -> {
-                        val data = it.response.socketData.sortedBy { it.position }
+                        val data = it.response.socketData.sortedBy { data ->
+                            data.position
+                        }
                         _socketData.clear()
                         _socketData.addAll(data)
                     }

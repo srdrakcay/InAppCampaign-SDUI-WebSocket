@@ -1,6 +1,5 @@
 package com.serdar.inappcampaign_sdui_websocket.data.websocket
 
-import android.util.Log
 import com.google.gson.Gson
 import com.serdar.inappcampaign_sdui_websocket.data.dto.SocketResponse
 import com.serdar.inappcampaign_sdui_websocket.data.resource.WebSocketResource

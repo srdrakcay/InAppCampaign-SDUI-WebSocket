@@ -2,6 +2,7 @@ package com.serdar.inappcampaign_sdui_websocket.feature.onetoone
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,8 @@ import com.serdar.inappcampaign_sdui_websocket.data.dto.SocketResponseItem
 import com.serdar.inappcampaign_sdui_websocket.data.dto.UsersResponseItem
 
 @Composable
-fun RowItemUI(modifier: Modifier, childList: UsersResponseItem, data: SocketResponseItem) {
+fun RowItemUI(modifier: Modifier, childList: UsersResponseItem, data: SocketResponseItem, onVoiceClick: () -> Unit,
+              onVideoClick: () -> Unit) {
 
     if (data.type == "Empty") {
         EmptyDataContent()
@@ -54,6 +56,9 @@ fun RowItemUI(modifier: Modifier, childList: UsersResponseItem, data: SocketResp
                     modifier = Modifier
                         .size(25.dp)
                         .clip(CircleShape)
+                        .clickable {
+                            onVoiceClick.invoke()
+                        }
                 )
                 Image(
                     painter = painterResource(id = R.drawable.ic_video),
@@ -61,16 +66,16 @@ fun RowItemUI(modifier: Modifier, childList: UsersResponseItem, data: SocketResp
                     modifier = Modifier
                         .size(25.dp)
                         .clip(CircleShape)
+                        .clickable {
+                                onVideoClick.invoke()
+                        }
                 )
             }
             Row(modifier = Modifier.align(Alignment.BottomStart)) {
 
                 GetImageFromCoilMini(
                     imageUrl = childList.userImage,
-                    modifier
-                        .size(38.dp)
-                        .padding(8.dp)
-                        .clip(CircleShape),
+
                 )
 
                 Text(

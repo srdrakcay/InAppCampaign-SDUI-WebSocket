@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -18,22 +19,44 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.serdar.inappcampaign_sdui_websocket.data.dto.SocketResponseItem
 import com.serdar.inappcampaign_sdui_websocket.data.dto.UsersResponseItem
+import com.serdar.inappcampaign_sdui_websocket.feature.bohoclub.BohoClubEventContent
 
 @Composable
-fun DifferentItemsLazyColumn(modifier: Modifier = Modifier, data: List<SocketResponseItem>) {
+fun DifferentItemsLazyColumn(
+    modifier: Modifier = Modifier,
+    data: List<SocketResponseItem>,
+    sample: List<SocketResponseItem>,
+    onVoiceClick: () -> Unit,
+    onVideoClick: () -> Unit
+) {
+
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
-        items(data) { item ->
-            DifferentItemsContent(Modifier, item.listItem, item)
+
+        itemsIndexed(sample) { index, item ->
+            if (index == 0) {
+                BohoClubEventContent(
+                    Modifier,
+                    item.listItem
+                )
+            }
+
+            DifferentItemsContent(Modifier, item.listItem, item, onVoiceClick, onVideoClick)
         }
+
     }
+
 
 }
 
 @Composable
 fun DifferentItemsContent(
-    modifier: Modifier, listItem: List<UsersResponseItem>, data: SocketResponseItem
+    modifier: Modifier,
+    listItem: List<UsersResponseItem>,
+    data: SocketResponseItem,
+    onVoiceClick: () -> Unit,
+    onVideoClick: () -> Unit
 ) {
     Card(
         Modifier.padding(5.dp), colors = CardDefaults.cardColors(
@@ -54,7 +77,7 @@ fun DifferentItemsContent(
             Modifier,
         ) {
             items(listItem) { item ->
-                RowItemUI(modifier, item, data)
+                RowItemUI(modifier.fillMaxSize(), item, data, onVoiceClick, onVideoClick)
             }
         }
     }
@@ -64,25 +87,6 @@ fun DifferentItemsContent(
 @Preview(showBackground = true)
 @Composable
 fun DifferentItemsLazyColumnPreview() {
-    val sampleData = listOf(
-        SocketResponseItem(
-            type = "YouFollow", position = 0, listItem = listOf(
-                UsersResponseItem("Test", "Serdar Test 1", 10, "...."),
-                UsersResponseItem("Test", "Serdar Test 2", 20, "...."),
-                UsersResponseItem("Test", "Serdar Test 3", 30, "...."),
-                UsersResponseItem("Test", "Serdar Test 4", 40, "....")
-            )
-        ),
-        SocketResponseItem(
-            type = "VideoMatches", position = 1, listItem = listOf(
-                UsersResponseItem("Test", "Serdar Test 1", 10, "...."),
-                UsersResponseItem("Test", "Serdar Test 2", 20, "...."),
-                UsersResponseItem("Test", "Serdar Test 3", 30, "...."),
-                UsersResponseItem("Test", "Serdar Test 4", 40, "....")
-            )
-        ),
-        // Add more sample data as needed
-    )
 
-    DifferentItemsLazyColumn(modifier = Modifier.fillMaxSize(), data = sampleData)
+
 }

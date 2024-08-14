@@ -1,5 +1,6 @@
 package com.serdar.inappcampaign_sdui_websocket.feature.onetoone
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
@@ -18,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -29,10 +32,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.serdar.inappcampaign_sdui_websocket.R
+import com.serdar.inappcampaign_sdui_websocket.data.dto.SocketResponseItem
 import com.serdar.inappcampaign_sdui_websocket.feature.MainViewModel
 
 @Composable
-fun OneToOneScreen(mainViewModel: MainViewModel = hiltViewModel()) {
+fun OneToOneScreen(data: List<SocketResponseItem>, mainViewModel: MainViewModel = hiltViewModel()) {
     Scaffold(modifier = Modifier, containerColor = Color.Black, topBar = {
         TopBarContent()
     }, bottomBar = {
@@ -47,7 +51,13 @@ fun OneToOneScreen(mainViewModel: MainViewModel = hiltViewModel()) {
                             Color(0xFF000000), Color(0xFFAC03F4), Color(0xFFDD1584)
                         )
                     )
-                ), mainViewModel.socketData
+                ), mainViewModel.socketData, data, onVoiceClick = {
+                Log.e("TAG", "OneToOneScreen: onVoiceClick ")
+            }, onVideoClick = {
+                Log.e("TAG", "OneToOneScreen: onVideoClick ")
+
+            }
+
         )
     }
 }
@@ -59,7 +69,7 @@ fun TopBarContent() {
             .background(
                 Color.Transparent
             )
-            .padding(start = 10.dp, end = 10.dp, bottom = 23.dp, top = 23.dp)
+            .padding(start = 10.dp, end = 10.dp, bottom = 23.dp, top = 45.dp)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -122,12 +132,15 @@ fun GetImageFromCoil(imageUrl: String) {
 }
 
 @Composable
-fun GetImageFromCoilMini(imageUrl: String, modifier: Modifier) {
+fun GetImageFromCoilMini(imageUrl: String, ) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current).data(imageUrl).crossfade(true).build(),
         contentDescription = "",
         contentScale = ContentScale.Crop,
-        modifier = modifier
+        modifier = Modifier
+            .size(38.dp)
+            .padding(8.dp)
+            .clip(CircleShape),
     )
 }
 
