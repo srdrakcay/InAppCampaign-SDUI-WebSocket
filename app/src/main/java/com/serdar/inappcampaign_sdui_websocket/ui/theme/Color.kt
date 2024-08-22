@@ -19,3 +19,6 @@ val PinkTime = Color(0xFFDF5AD6)
 
 val OrangeButton = Color(0xFFFF971A)
 val PinkButton = Color(0xFFE260C6)
+
+val BlueBean = Color(0xFF35FFF3)
+val GreenBean = Color(0xFF0BDE85)
