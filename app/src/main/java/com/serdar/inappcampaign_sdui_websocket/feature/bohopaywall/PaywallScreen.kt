@@ -11,17 +11,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -67,7 +74,7 @@ data class BackgroundConfig(
 
 @Serializable
 data class BackgroundStyle(
-    val brushType:String,
+    val brushType: String,
 )
 
 @Serializable
@@ -227,35 +234,38 @@ data class ReviewStyle(
     val secondaryTextColor: String,
 )
 
-fun brushType(config: BackgroundConfig):Brush{
-  return  when(config.style.brushType){
+fun brushType(config: BackgroundConfig): Brush {
+    return when (config.style.brushType) {
         "Horizantal" -> Brush.horizontalGradient(
             colors = listOf(
                 Color(android.graphics.Color.parseColor(config.brush.startColor)),
                 Color(android.graphics.Color.parseColor(config.brush.endColor))
             )
         )
-      "Vertical" ->  Brush.verticalGradient(
-          colors = listOf(
-              Color(android.graphics.Color.parseColor(config.brush.startColor)),
-              Color(android.graphics.Color.parseColor(config.brush.endColor))
-          )
-      )
-      "Linear" ->  Brush.linearGradient(
-          colors = listOf(
-              Color(android.graphics.Color.parseColor(config.brush.startColor)),
-              Color(android.graphics.Color.parseColor(config.brush.endColor))
-          )
-      )
 
-      else -> {
-          Brush.horizontalGradient(
-              colors = listOf(
-                  Color(android.graphics.Color.parseColor(config.brush.startColor)),
-                  Color(android.graphics.Color.parseColor(config.brush.endColor))
-              ))
-      }
-  }
+        "Vertical" -> Brush.verticalGradient(
+            colors = listOf(
+                Color(android.graphics.Color.parseColor(config.brush.startColor)),
+                Color(android.graphics.Color.parseColor(config.brush.endColor))
+            )
+        )
+
+        "Linear" -> Brush.linearGradient(
+            colors = listOf(
+                Color(android.graphics.Color.parseColor(config.brush.startColor)),
+                Color(android.graphics.Color.parseColor(config.brush.endColor))
+            )
+        )
+
+        else -> {
+            Brush.horizontalGradient(
+                colors = listOf(
+                    Color(android.graphics.Color.parseColor(config.brush.startColor)),
+                    Color(android.graphics.Color.parseColor(config.brush.endColor))
+                )
+            )
+        }
+    }
 }
 
 @Composable
@@ -264,8 +274,7 @@ fun SDUIScreen(config: ScreenConfig) {
         modifier = Modifier
             .fillMaxSize()
             .background(
-                brush =
-               brushType(config.background)
+                brush = brushType(config.background)
 
             )
             .padding(config.padding.dp)
@@ -285,19 +294,31 @@ fun SDUIScreen(config: ScreenConfig) {
 
 @Composable
 fun SDUIText(config: ComponentConfig.Text) {
-    Text(
-        text = config.content,
-        color = Color(android.graphics.Color.parseColor(config.style.color)),
-        fontSize = config.style.fontSize.sp,
-        fontWeight = when (config.style.fontWeight) {
-            "bold" -> FontWeight.Bold
-            else -> FontWeight.Normal
-        },
-        modifier = Modifier.padding(bottom = (config.style.paddingBottom ?: 0).dp)
-    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 24.dp)
+    ) {
+        Text(
+            text = config.content,
+            style = MaterialTheme.typography.headlineMedium,
+            color = Color(android.graphics.Color.parseColor(config.style.color)),
+            fontSize = config.style.fontSize.sp,
+            fontWeight = when (config.style.fontWeight) {
+                "bold" -> FontWeight.Bold
+                else -> FontWeight.Normal
+            },
+            modifier = Modifier.align(Alignment.Center)
+        )
+        Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = "Close",
+            tint = Color.White,
+            modifier = Modifier.align(Alignment.TopEnd)
+        )
+    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SDUIGrid(config: ComponentConfig.Grid) {
     LazyVerticalGrid(
@@ -305,21 +326,14 @@ fun SDUIGrid(config: ComponentConfig.Grid) {
     ) {
         items(config.items) { planConfig ->
             var isSelected by remember { mutableStateOf(false) }
-            Card(modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    width = if (isSelected) 2.dp else 1.dp, color = Color(
-                        android.graphics.Color.parseColor(
-                            if (isSelected) planConfig.style.selectedBorderColor
-                            else planConfig.style.unselectedBorderColor
-                        )
-                    ), shape = RoundedCornerShape(16.dp)
-                )
-                .padding(16.dp), onClick = { isSelected = !isSelected }) {
-                Text("${planConfig.data.tag}")
-                Text("${planConfig.data.amount}")
-                Text(planConfig.data.price)
-            }
+            PremiumPlanCard(
+                coins = "100.000",
+                period = "30 günde bir yenilenir",
+                discount = "-40%",
+                price = "4.399₺/Ay",
+                originalPrice = "7399,99₺",
+                isMonthly = true
+            )
         }
     }
 }
@@ -331,17 +345,20 @@ fun SDUIFeaturesList(config: ComponentConfig.FeaturesList) {
     ) {
         config.items.forEach { feature ->
             Row(
-                modifier = Modifier.padding(vertical = config.style.spacing.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "•",
-                    color = Color(android.graphics.Color.parseColor(config.style.bulletColor)),
-                    modifier = Modifier.padding(end = 8.dp)
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
                 )
                 Text(
                     text = feature,
-                    color = Color(android.graphics.Color.parseColor(config.style.textColor))
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(start = 12.dp)
                 )
             }
         }
@@ -381,14 +398,54 @@ fun SDUIReviewCard(config: ComponentConfig.ReviewCard) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp)
+            .padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF2A2A2A)
+        ),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(config.data.title)
-            Text(config.data.date)
-            Text(config.data.author)
+            Text(
+                text = config.data.title,
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White
+            )
+            Row(
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+                repeat(config.data.rating) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        tint = Color(0xFFFFC107),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+            Text(
+                text = config.data.review,
+                color = Color.White,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = config.data.author,
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = config.data.date,
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
@@ -746,4 +803,3 @@ fun SDUIScreenPreview() {
     val screenConfig = json.decodeFromString<ScreenConfig>(jsonString)
     SDUIScreen(screenConfig)
 }
-
