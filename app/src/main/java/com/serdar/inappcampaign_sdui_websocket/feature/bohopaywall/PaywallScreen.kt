@@ -12,14 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -32,10 +30,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -120,7 +114,6 @@ data class ItemStyle(
 
 @Serializable
 sealed class ComponentConfig {
-
     @Serializable
     @SerialName("text")
     data class Text(
@@ -129,10 +122,12 @@ sealed class ComponentConfig {
     ) : ComponentConfig()
 
     @Serializable
-    @SerialName("grid")
-    data class Grid(
-        val columns: Int,
-        val items: List<PlanCardConfig>,
+    @SerialName("productList")
+    data class ProductList(
+        val types: ListType,
+        val items: List<ListItemConfig>,
+        val style: ListStyle,
+        val gridColumns: Int? = null,
     ) : ComponentConfig()
 
     @Serializable
@@ -275,14 +270,13 @@ fun SDUIScreen(config: ScreenConfig) {
             .fillMaxSize()
             .background(
                 brush = brushType(config.background)
-
             )
             .padding(config.padding.dp)
     ) {
         config.children.forEach { component ->
             when (component) {
                 is ComponentConfig.Text -> SDUIText(component)
-                is ComponentConfig.Grid -> SDUIGrid(component)
+                is ComponentConfig.ProductList -> SDUIProductList(component)
                 is ComponentConfig.FeaturesList -> SDUIFeaturesList(component)
                 is ComponentConfig.Button -> SDUIButton(component)
                 is ComponentConfig.ReviewCard -> SDUIReviewCard(component)
@@ -319,21 +313,77 @@ fun SDUIText(config: ComponentConfig.Text) {
     }
 }
 
+
 @Composable
-fun SDUIGrid(config: ComponentConfig.Grid) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(config.columns), modifier = Modifier.fillMaxWidth()
-    ) {
-        items(config.items) { planConfig ->
-            var isSelected by remember { mutableStateOf(false) }
-            PremiumPlanCard(
-                coins = "100.000",
-                period = "30 günde bir yenilenir",
-                discount = "-40%",
-                price = "4.399₺/Ay",
-                originalPrice = "7399,99₺",
-                isMonthly = true
-            )
+fun SDUIProductList(config: ComponentConfig.ProductList) {
+    when (config.types) {
+        ListType.HORIZONTAL -> {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(config.style.spacing.dp),
+                contentPadding = PaddingValues(
+                    horizontal = config.style.padding.horizontal.dp,
+                    vertical = config.style.padding.vertical.dp
+                )
+            ) {
+                items(config.items.size) { index ->
+                    PremiumPlanCard(
+                        coins = config.items[index].data.title,
+                        period = config.items[index].data.subtitle ?: "",
+                        discount = config.items[index].data.badge ?: "",
+                        price = config.items[index].data.price ?: "",
+                        originalPrice = config.items[index].data.description ?: "",
+                        isPopular = index == 0,
+                        isMonthly = false,
+                        modifier = Modifier.width(300.dp) // Customize width for horizontal scroll
+                    )
+                }
+            }
+        }
+
+        ListType.VERTICAL -> {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(config.style.spacing.dp),
+                contentPadding = PaddingValues(
+                    horizontal = config.style.padding.horizontal.dp,
+                    vertical = config.style.padding.vertical.dp
+                )
+            ) {
+                items(config.items.size) { index ->
+                    PremiumPlanCard(
+                        coins = config.items[index].data.title,
+                        period = config.items[index].data.subtitle ?: "",
+                        discount = config.items[index].data.badge ?: "",
+                        price = config.items[index].data.price ?: "",
+                        originalPrice = config.items[index].data.description ?: "",
+                        isPopular = index == 0,
+                        isMonthly = false
+                    )
+                }
+            }
+        }
+
+        ListType.GRID -> {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(config.gridColumns ?: 2),
+                horizontalArrangement = Arrangement.spacedBy(config.style.spacing.dp),
+                verticalArrangement = Arrangement.spacedBy(config.style.spacing.dp),
+                contentPadding = PaddingValues(
+                    horizontal = config.style.padding.horizontal.dp,
+                    vertical = config.style.padding.vertical.dp
+                )
+            ) {
+                items(config.items.size) { index ->
+                    PremiumPlanCard(
+                        coins = config.items[index].data.title,
+                        period = config.items[index].data.subtitle ?: "",
+                        discount = config.items[index].data.badge ?: "",
+                        price = config.items[index].data.price ?: "",
+                        originalPrice = config.items[index].data.description ?: "",
+                        isPopular = index == 0,
+                        isMonthly = false
+                    )
+                }
+            }
         }
     }
 }
@@ -345,8 +395,7 @@ fun SDUIFeaturesList(config: ComponentConfig.FeaturesList) {
     ) {
         config.items.forEach { feature ->
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,
@@ -619,58 +668,81 @@ fun SDUIScreenPreview() {
       }
     },
     {
-      "type": "grid",
-      "columns": 1,
+      "type": "productList",
+      "types": "HORIZONTAL",
       "items": [
         {
+          "type": "listItem",
           "data": {
-            "amount": 10,
-            "period": "month",
-            "discount": 20,
-            "originalPrice": "${'$'}12.99",
-            "price": "${'$'}9.99",
-            "tag": "Best Deal"
+            "title": "15.000",
+            "subtitle": "7 günde bir yenilenir",
+            "badge": "-50%",
+            "price": "649₺/hafta",
+            "description": "1209,99₺"
           },
           "style": {
-            "selectedBorderColor": "#FF9800",
-            "unselectedBorderColor": "#E0E0E0",
-            "backgroundColor": "#FFFFFF",
-            "tagBackgroundColor": "#FFC107"
+            "backgroundColor": "#2A2A2A",
+            "cornerRadius": 16,
+            "elevation": 4,
+            "titleColor": "#FFFFFF",
+            "subtitleColor": "#757575",
+            "padding": {
+              "horizontal": 4,
+              "vertical": 4
+            }
           }
         },
-         {
+        {
+          "type": "listItem",
           "data": {
-            "amount": 10,
-            "period": "month",
-            "discount": 20,
-            "originalPrice": "${'$'}12.99",
-            "price": "${'$'}9.99",
-            "tag": "Best Deal"
+            "title": "7.500",
+            "subtitle": "7 günde bir yenilenir",
+            "badge": "-35%",
+            "price": "410,99₺/hafta",
+            "description": "649₺"
           },
           "style": {
-            "selectedBorderColor": "#FF9800",
-            "unselectedBorderColor": "#E0E0E0",
-            "backgroundColor": "#FFFFFF",
-            "tagBackgroundColor": "#FFC107"
+            "backgroundColor": "#2A2A2A",
+            "cornerRadius": 16,
+            "elevation": 4,
+            "titleColor": "#FFFFFF",
+            "subtitleColor": "#757575",
+            "padding": {
+              "horizontal": 4,
+              "vertical": 4
+            }
           }
         },
-         {
+        {
+          "type": "listItem",
           "data": {
-            "amount": 10,
-            "period": "month",
-            "discount": 20,
-            "originalPrice": "${'$'}12.99",
-            "price": "${'$'}9.99",
-            "tag": "Best Deal"
+            "title": "100.000",
+            "subtitle": "30 günde bir yenilenir",
+            "badge": "-40%",
+            "price": "4.399₺/Ay",
+            "description": "7399,99₺"
           },
           "style": {
-            "selectedBorderColor": "#FF9800",
-            "unselectedBorderColor": "#E0E0E0",
-            "backgroundColor": "#FFFFFF",
-            "tagBackgroundColor": "#FFC107"
+            "backgroundColor": "#2A2A2A",
+            "cornerRadius": 16,
+            "elevation": 4,
+            "titleColor": "#FFFFFF",
+            "subtitleColor": "#757575",
+            "padding": {
+              "horizontal": 4,
+              "vertical": 4
+            }
           }
         }
-      ]
+      ],
+      "style": {
+        "spacing": 16,
+        "padding": {
+          "horizontal": 16,
+          "vertical": 12
+        },
+        "cardStyle": "BASIC"
+      }
     },
     {
       "type": "featuresList",
@@ -723,7 +795,7 @@ fun SDUIScreenPreview() {
             }
           }
         },
-         {
+        {
           "type": "listItem",
           "data": {
             "title": "Premium Plan",
@@ -745,7 +817,7 @@ fun SDUIScreenPreview() {
             }
           }
         },
-         {
+        {
           "type": "listItem",
           "data": {
             "title": "Premium Plan",
@@ -794,7 +866,6 @@ fun SDUIScreenPreview() {
     }
   ]
 }
-
     """.trimIndent()
     val json = Json {
         ignoreUnknownKeys = true

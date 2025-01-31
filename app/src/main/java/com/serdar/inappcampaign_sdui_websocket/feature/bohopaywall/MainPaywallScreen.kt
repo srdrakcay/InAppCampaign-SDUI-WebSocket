@@ -188,10 +188,11 @@ fun PremiumPlanCard(
     price: String,
     originalPrice: String,
     isPopular: Boolean = false,
-    isMonthly: Boolean = false
+    isMonthly: Boolean = false,
+    modifier: Modifier=Modifier
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .border(
                 width = 1.dp,
