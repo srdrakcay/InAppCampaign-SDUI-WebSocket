@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -51,144 +52,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-@Composable
-fun SDUIScreens(config: ScreenConfig) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF1A1A1A),
-                        Color(0xFF0A0A0A)
-                    )
-                )
-            )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            // Header with close button
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp)
-            ) {
-                Text(
-                    text = "Boho Live Silver Weekly",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.White,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Close",
-                    tint = Color.White,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                )
-            }
-
-            // Premium Plans
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Weekly Premium Plan Card
-                PremiumPlanCard(
-                    coins = "15.000",
-                    period = "7 günde bir yenilenir",
-                    discount = "-50%",
-                    price = "649₺/hafta",
-                    originalPrice = "1209,99₺",
-                    isPopular = true
-                )
-
-                // Weekly Basic Plan Card
-                PremiumPlanCard(
-                    coins = "7.500",
-                    period = "7 günde bir yenilenir",
-                    discount = "-35%",
-                    price = "410,99₺/hafta",
-                    originalPrice = "649₺",
-                    isPopular = false
-                )
-            }
-
-            // Features List
-            LazyColumn(
-                modifier = Modifier.padding(vertical = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(features) { feature ->
-                    FeatureItem(text = feature)
-                }
-            }
-
-            // Monthly Premium Plan
-            PremiumPlanCard(
-                coins = "100.000",
-                period = "30 günde bir yenilenir",
-                discount = "-40%",
-                price = "4.399₺/Ay",
-                originalPrice = "7399,99₺",
-                isMonthly = true
-            )
-
-            // Subscribe Button
-            GradientButton(
-                text = "Subscribe now",
-                onClick = { /* Handle subscribe */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp)
-            )
-
-            // Review Card
-            ReviewCard(
-                rating = 5,
-                review = "Kullandığım en iyi görüntülü ve sesli sohbet uygulaması!",
-                author = "Mert Saygın",
-                date = "Mayıs 21"
-            )
-
-            // Footer
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 24.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Terms of Use",
-                    color = Color.Gray,
-                    modifier = Modifier.clickable { /* Handle terms */ }
-                )
-                Text(
-                    text = " | ",
-                    color = Color.Gray
-                )
-                Text(
-                    text = "Privacy Policy",
-                    color = Color.Gray,
-                    modifier = Modifier.clickable { /* Handle privacy */ }
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun PremiumPlanCard(
-    coins: String,
-    period: String,
-    discount: String,
-    price: String,
-    originalPrice: String,
-    isPopular: Boolean = false,
-    isMonthly: Boolean = false,
+    config: ListItemConfig,
     modifier: Modifier=Modifier
 ) {
     Card(
@@ -202,17 +69,17 @@ fun PremiumPlanCard(
                         Color(0xFF9C27B0)
                     )
                 ),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(config.style.cornerRadius.dp)
             ),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFF2A2A2A)
         ),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(config.style.cornerRadius.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = modifier.padding(16.dp)
         ) {
-            if (isPopular) {
+            if (config.data.isMonthly) {
                 Text(
                     text = "EN POPÜLER",
                     color = Color(0xFF9C27B0),
@@ -220,7 +87,7 @@ fun PremiumPlanCard(
                     modifier = Modifier.align(Alignment.End)
                 )
             }
-            if (isMonthly) {
+            if (config.data.isPopular) {
                 Text(
                     text = "EN İYİ TEKLİF",
                     color = Color(0xFF9C27B0),
@@ -239,23 +106,26 @@ fun PremiumPlanCard(
                 ) {
 
                     Text(
-                        text = coins,
+                        text = config.data.price.toString(),
                         style = MaterialTheme.typography.headlineMedium,
                         color = Color.White,
+                        fontSize = config.style.titleSize.sp,
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
                 Text(
-                    text = discount,
+                    text = config.data.badge.toString(),
                     color = Color(0xFF00FF00),
+                    fontSize = config.style.subTitleSize.sp,
                     style = MaterialTheme.typography.labelLarge
                 )
             }
 
             Text(
-                text = period,
+                text = config.data.subtitle.toString(),
                 color = Color.Gray,
                 style = MaterialTheme.typography.bodyMedium,
+                fontSize = config.style.subTitleSize.sp,
                 modifier = Modifier.padding(top = 4.dp)
             )
 
@@ -267,14 +137,14 @@ fun PremiumPlanCard(
                     .padding(top = 8.dp)
             ) {
                 Text(
-                    text = originalPrice,
+                    text = config.data.description.toString(),
                     color = Color.Gray,
                     style = MaterialTheme.typography.bodyMedium,
                     textDecoration = TextDecoration.LineThrough,
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Text(
-                    text = price,
+                    text = config.data.price.toString(),
                     color = Color.White,
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -282,344 +152,3 @@ fun PremiumPlanCard(
         }
     }
 }
-
-@Composable
-private fun FeatureItem(text: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Icon(
-            imageVector = Icons.Default.Check,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(20.dp)
-        )
-        Text(
-            text = text,
-            color = Color.White,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(start = 12.dp)
-        )
-    }
-}
-
-@Composable
-private fun GradientButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier
-            .height(56.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent
-        ),
-        contentPadding = PaddingValues(0.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            Color(0xFF00FF00),
-                            Color(0xFF9C27B0)
-                        )
-                    ),
-                    shape = RoundedCornerShape(28.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = text,
-                color = Color.White,
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-    }
-}
-
-@Composable
-private fun ReviewCard(
-    rating: Int,
-    review: String,
-    author: String,
-    date: String
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2A2A2A)
-        ),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = "OMG",
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White
-            )
-            Row(
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                repeat(rating) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = Color(0xFFFFC107),
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-            Text(
-                text = review,
-                color = Color.White,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = author,
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = date,
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun SDUIScreenPreviews() {
-    val jsonString = """
-{
-  "type": "screen",
-   "background": {
-    "brush": {
-      "startColor": "#FF5800",
-      "endColor": "#F44336"
-    },
-    "style":{
-      "brushType": "Vertical"
-    }
-  },
-  "padding": 16,
-  "children": [
-    {
-      "type": "text",
-      "content": "Welcome to Boho Paywall",
-      "style": {
-        "color": "#000000",
-        "fontSize": 20,
-        "fontWeight": "bold",
-        "paddingBottom": 8
-      }
-    },
-    {
-      "type": "grid",
-      "columns": 1,
-      "items": [
-        {
-          "data": {
-            "amount": 10,
-            "period": "month",
-            "discount": 20,
-            "originalPrice": "${'$'}12.99",
-            "price": "${'$'}9.99",
-            "tag": "Best Deal"
-          },
-          "style": {
-            "selectedBorderColor": "#FF9800",
-            "unselectedBorderColor": "#E0E0E0",
-            "backgroundColor": "#FFFFFF",
-            "tagBackgroundColor": "#FFC107"
-          }
-        },
-         {
-          "data": {
-            "amount": 10,
-            "period": "month",
-            "discount": 20,
-            "originalPrice": "${'$'}12.99",
-            "price": "${'$'}9.99",
-            "tag": "Best Deal"
-          },
-          "style": {
-            "selectedBorderColor": "#FF9800",
-            "unselectedBorderColor": "#E0E0E0",
-            "backgroundColor": "#FFFFFF",
-            "tagBackgroundColor": "#FFC107"
-          }
-        },
-         {
-          "data": {
-            "amount": 10,
-            "period": "month",
-            "discount": 20,
-            "originalPrice": "${'$'}12.99",
-            "price": "${'$'}9.99",
-            "tag": "Best Deal"
-          },
-          "style": {
-            "selectedBorderColor": "#FF9800",
-            "unselectedBorderColor": "#E0E0E0",
-            "backgroundColor": "#FFFFFF",
-            "tagBackgroundColor": "#FFC107"
-          }
-        }
-      ]
-    },
-    {
-      "type": "featuresList",
-      "items": [
-        "Unlimited access",
-        "Ad-free experience",
-        "Priority support"
-      ],
-      "style": {
-        "bulletColor": "#FF5722",
-        "textColor": "#333333",
-        "spacing": 8
-      }
-    },
-    {
-      "type": "button",
-      "content": "Subscribe Now",
-      "style": {
-        "gradient": {
-          "startColor": "#FF9800",
-          "endColor": "#F44336"
-        },
-        "height": 48,
-        "cornerRadius": 8
-      }
-    },
-    {
-      "type": "lists",
-      "types": "HORIZONTAL",
-      "items": [
-        {
-          "type": "listItem",
-          "data": {
-            "title": "Premium Plan",
-            "subtitle": "Best for professionals",
-            "image": "https://example.com/image.png",
-            "badge": "Popular",
-            "price": "${'$'}9.99/month",
-            "description": "Access to exclusive content"
-          },
-          "style": {
-            "backgroundColor": "#FAFAFA",
-            "cornerRadius": 12,
-            "elevation": 4,
-            "titleColor": "#000000",
-            "subtitleColor": "#757575",
-            "padding": {
-              "horizontal": 16,
-              "vertical": 12
-            }
-          }
-        },
-         {
-          "type": "listItem",
-          "data": {
-            "title": "Premium Plan",
-            "subtitle": "Best for professionals",
-            "image": "https://example.com/image.png",
-            "badge": "Popular",
-            "price": "${'$'}9.99/month",
-            "description": "Access to exclusive content"
-          },
-          "style": {
-            "backgroundColor": "#FAFAFA",
-            "cornerRadius": 12,
-            "elevation": 4,
-            "titleColor": "#000000",
-            "subtitleColor": "#757575",
-            "padding": {
-              "horizontal": 16,
-              "vertical": 12
-            }
-          }
-        },
-         {
-          "type": "listItem",
-          "data": {
-            "title": "Premium Plan",
-            "subtitle": "Best for professionals",
-            "image": "https://example.com/image.png",
-            "badge": "Popular",
-            "price": "${'$'}9.99/month",
-            "description": "Access to exclusive content"
-          },
-          "style": {
-            "backgroundColor": "#FAFAFA",
-            "cornerRadius": 12,
-            "elevation": 4,
-            "titleColor": "#000000",
-            "subtitleColor": "#757575",
-            "padding": {
-              "horizontal": 16,
-              "vertical": 12
-            }
-          }
-        }
-      ],
-      "style": {
-        "spacing": 16,
-        "padding": {
-          "horizontal": 16,
-          "vertical": 12
-        },
-        "cardStyle": "ELEVATED"
-      }
-    },
-    {
-      "type": "reviewCard",
-      "data": {
-        "title": "Great Service!",
-        "rating": 5,
-        "review": "I've been using this for months, and it's amazing.",
-        "author": "John Doe",
-        "date": "2024-01-31"
-      },
-      "style": {
-        "backgroundColor": "#FFFFFF",
-        "textColor": "#000000",
-        "secondaryTextColor": "#757575"
-      }
-    }
-  ]
-}
-
-    """.trimIndent()
-    val json = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
-    val screenConfig = json.decodeFromString<ScreenConfig>(jsonString)
-    SDUIScreens(screenConfig)
-}
-private val features = listOf(
-    "Free Join to Live Influencer Streams",
-    "Limitless Messages",
-    "3 Free Access to Premium Streams Per Week",
-    "3 Free Access to Private Rooms Per Week",
-    "Boho Club Membership Tag"
-)

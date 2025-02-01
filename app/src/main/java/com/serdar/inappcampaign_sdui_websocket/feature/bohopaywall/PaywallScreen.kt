@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -76,6 +77,8 @@ data class ListStyle(
     val spacing: Int,
     val padding: PaddingStyle,
     val cardStyle: CardStyle,
+    val width: Int,
+    val height: Int,
 )
 
 @Serializable
@@ -98,6 +101,8 @@ data class ItemData(
     val image: String? = null,
     val badge: String? = null,
     val price: String? = null,
+    val isMonthly: Boolean = false,
+    val isPopular:Boolean=false,
     val description: String? = null,
 )
 
@@ -109,6 +114,8 @@ data class ItemStyle(
     val gradientColors: List<String>? = null,
     val titleColor: String,
     val subtitleColor: String? = null,
+    val titleSize:Int,
+    val subTitleSize:Int,
     val padding: PaddingStyle = PaddingStyle(),
 )
 
@@ -231,7 +238,7 @@ data class ReviewStyle(
 
 fun brushType(config: BackgroundConfig): Brush {
     return when (config.style.brushType) {
-        "Horizantal" -> Brush.horizontalGradient(
+        "Horizontal" -> Brush.horizontalGradient(
             colors = listOf(
                 Color(android.graphics.Color.parseColor(config.brush.startColor)),
                 Color(android.graphics.Color.parseColor(config.brush.endColor))
@@ -325,16 +332,10 @@ fun SDUIProductList(config: ComponentConfig.ProductList) {
                     vertical = config.style.padding.vertical.dp
                 )
             ) {
-                items(config.items.size) { index ->
+                items(config.items) { data ->
                     PremiumPlanCard(
-                        coins = config.items[index].data.title,
-                        period = config.items[index].data.subtitle ?: "",
-                        discount = config.items[index].data.badge ?: "",
-                        price = config.items[index].data.price ?: "",
-                        originalPrice = config.items[index].data.description ?: "",
-                        isPopular = index == 0,
-                        isMonthly = false,
-                        modifier = Modifier.width(300.dp) // Customize width for horizontal scroll
+                        data,
+                        modifier = Modifier.size(height =config.style.height.dp, width = config.style.width.dp )
                     )
                 }
             }
@@ -350,13 +351,7 @@ fun SDUIProductList(config: ComponentConfig.ProductList) {
             ) {
                 items(config.items.size) { index ->
                     PremiumPlanCard(
-                        coins = config.items[index].data.title,
-                        period = config.items[index].data.subtitle ?: "",
-                        discount = config.items[index].data.badge ?: "",
-                        price = config.items[index].data.price ?: "",
-                        originalPrice = config.items[index].data.description ?: "",
-                        isPopular = index == 0,
-                        isMonthly = false
+                        config.items[index]
                     )
                 }
             }
@@ -374,13 +369,7 @@ fun SDUIProductList(config: ComponentConfig.ProductList) {
             ) {
                 items(config.items.size) { index ->
                     PremiumPlanCard(
-                        coins = config.items[index].data.title,
-                        period = config.items[index].data.subtitle ?: "",
-                        discount = config.items[index].data.badge ?: "",
-                        price = config.items[index].data.price ?: "",
-                        originalPrice = config.items[index].data.description ?: "",
-                        isPopular = index == 0,
-                        isMonthly = false
+                       config.items[index]
                     )
                 }
             }
@@ -646,12 +635,12 @@ fun SDUIScreenPreview() {
     val jsonString = """
 {
   "type": "screen",
-   "background": {
+  "background": {
     "brush": {
       "startColor": "#FF5800",
       "endColor": "#F44336"
     },
-    "style":{
+    "style": {
       "brushType": "Vertical"
     }
   },
@@ -659,10 +648,10 @@ fun SDUIScreenPreview() {
   "children": [
     {
       "type": "text",
-      "content": "Welcome to Boho Paywall",
+      "content": "Welcome to Paywall",
       "style": {
         "color": "#000000",
-        "fontSize": 20,
+        "fontSize": 25,
         "fontWeight": "bold",
         "paddingBottom": 8
       }
@@ -678,14 +667,17 @@ fun SDUIScreenPreview() {
             "subtitle": "7 günde bir yenilenir",
             "badge": "-50%",
             "price": "649₺/hafta",
+            "isMonthly": false,
+            "isPopular": false,
             "description": "1209,99₺"
           },
           "style": {
             "backgroundColor": "#2A2A2A",
-            "cornerRadius": 16,
-            "elevation": 4,
+            "cornerRadius": 10,
             "titleColor": "#FFFFFF",
             "subtitleColor": "#757575",
+            "titleSize": 14,
+            "subTitleSize": 10,
             "padding": {
               "horizontal": 4,
               "vertical": 4
@@ -699,14 +691,17 @@ fun SDUIScreenPreview() {
             "subtitle": "7 günde bir yenilenir",
             "badge": "-35%",
             "price": "410,99₺/hafta",
+             "isMonthly": false,
+            "isPopular": true,
             "description": "649₺"
           },
           "style": {
             "backgroundColor": "#2A2A2A",
             "cornerRadius": 16,
-            "elevation": 4,
             "titleColor": "#FFFFFF",
             "subtitleColor": "#757575",
+             "titleSize": 18,
+            "subTitleSize": 10,
             "padding": {
               "horizontal": 4,
               "vertical": 4
@@ -720,14 +715,17 @@ fun SDUIScreenPreview() {
             "subtitle": "30 günde bir yenilenir",
             "badge": "-40%",
             "price": "4.399₺/Ay",
+             "isMonthly": true,
+            "isPopular": false,
             "description": "7399,99₺"
           },
           "style": {
             "backgroundColor": "#2A2A2A",
-            "cornerRadius": 16,
-            "elevation": 4,
+            "cornerRadius": 0,
             "titleColor": "#FFFFFF",
             "subtitleColor": "#757575",
+             "titleSize": 30,
+            "subTitleSize": 10,
             "padding": {
               "horizontal": 4,
               "vertical": 4
@@ -741,7 +739,9 @@ fun SDUIScreenPreview() {
           "horizontal": 16,
           "vertical": 12
         },
-        "cardStyle": "BASIC"
+        "cardStyle": "BASIC",
+        "width": 200,
+        "height": 150
       }
     },
     {
@@ -762,11 +762,11 @@ fun SDUIScreenPreview() {
       "content": "Subscribe Now",
       "style": {
         "gradient": {
-          "startColor": "#FF9800",
-          "endColor": "#F44336"
+          "startColor": "#FF7690",
+          "endColor": "#FF7690"
         },
-        "height": 48,
-        "cornerRadius": 8
+        "height": 50,
+        "cornerRadius": 0
       }
     },
     {
@@ -781,14 +781,16 @@ fun SDUIScreenPreview() {
             "image": "https://example.com/image.png",
             "badge": "Popular",
             "price": "${'$'}9.99/month",
+           
             "description": "Access to exclusive content"
           },
           "style": {
             "backgroundColor": "#FAFAFA",
             "cornerRadius": 12,
-            "elevation": 4,
             "titleColor": "#000000",
             "subtitleColor": "#757575",
+             "titleSize": 10,
+            "subTitleSize": 10,
             "padding": {
               "horizontal": 16,
               "vertical": 12
@@ -808,9 +810,10 @@ fun SDUIScreenPreview() {
           "style": {
             "backgroundColor": "#FAFAFA",
             "cornerRadius": 12,
-            "elevation": 4,
             "titleColor": "#000000",
             "subtitleColor": "#757575",
+              "titleSize": 10,
+            "subTitleSize": 10,
             "padding": {
               "horizontal": 16,
               "vertical": 12
@@ -830,9 +833,10 @@ fun SDUIScreenPreview() {
           "style": {
             "backgroundColor": "#FAFAFA",
             "cornerRadius": 12,
-            "elevation": 4,
             "titleColor": "#000000",
             "subtitleColor": "#757575",
+              "titleSize": 10,
+            "subTitleSize": 10,
             "padding": {
               "horizontal": 16,
               "vertical": 12
@@ -846,14 +850,16 @@ fun SDUIScreenPreview() {
           "horizontal": 16,
           "vertical": 12
         },
-        "cardStyle": "ELEVATED"
+        "cardStyle": "ELEVATED",
+        "width": 300,
+        "height": 500
       }
     },
     {
       "type": "reviewCard",
       "data": {
         "title": "Great Service!",
-        "rating": 5,
+        "rating": 1,
         "review": "I've been using this for months, and it's amazing.",
         "author": "John Doe",
         "date": "2024-01-31"
